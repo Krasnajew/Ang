@@ -14,6 +14,8 @@ class QTextEdit;
 class QLabel;
 QT_END_NAMESPACE
 
+/*This class provide window that display Words library*/
+
 class BaseWindow : public QWidget
 {
     Q_OBJECT
@@ -23,10 +25,9 @@ public:
 signals:
 
 public slots:
-    void openFile();
-    void baseStringUPD();
+    void openFile(); //open Words library .txt file
+    void baseStringUPD(); //update displaying Word library
 private:
-    //std::unique_ptr<WordBase> wordB;
     std::shared_ptr<WordBase> base_ptr; //pointer to main word library
 
     QGridLayout *layout;
@@ -34,7 +35,6 @@ private:
     QPushButton *loadButton;
     QPushButton *openTxt;
     QTextEdit *base;
-    //QLabel *fileName;
 };
 
 #endif // BASEWINDOW_H

@@ -5,19 +5,17 @@
 #include <QDebug>
 #include <algorithm>
 #include<iterator>
-//#include <iterator>>
 
 void WordSet::addWord(QString pln, QString ang)
 {
     Word temp{pln, ang};
     set->push_back(temp);
 
-    //size++;
 }
 void WordSet::clear()
 {
     set->clear();
-    //size=0;
+
 }
 QString WordSet::getWordSetString() const
 {
@@ -29,19 +27,19 @@ QString WordSet::getWordSetString() const
    }
    else
    {
-       for(int i = 0; i<set->size(); i++)
+       for(int i = 0; i<set->size(); i++) //create QString contain every word in Wird Library
        {
            temp.push_back(set->at(i).getEngPln() + "\n");
        }
    }
-   //qDebug()<<size;
+
    return temp;
 }
 ////////WordBase///////////
 WordBase::WordBase(const QString &filename):
     baseFileName(filename)
 {
-    //lastID=0;
+
     loadBase();
     test = new Test("terminator.txt");
 }
@@ -55,27 +53,11 @@ int WordBase::addNewSet(WordSet &newS)
 
 QSet<int> WordBase::lateSet() const
 {
-    auto temp = test->lateSet(); /// get all set of word who user shoud repeat but faill
+    auto temp = test->lateSet(); // get all set of word who user shoud repeat but faill
     auto d = temp.toList();
-    auto c = d.toSet(); /// wycina powtarzajace sie elementy
+    auto c = d.toSet(); // erase reccuring words set
     return c;
 }
-
-/*int WordBase::repWordCount()
-{
-    auto l = lateSet();
-    auto t = todaySet();
-    int c_l = 0;
-    int c_t = 0;
-    std::for_each(l.begin(), l.end(), [&c_l, this](auto i){
-        c_l += (this->getSet(i))->getSize();
-    });
-    std::for_each(t.begin(), t.end(), [&c_t, this](auto i){
-        c_t += (this->getSet(i))->getSize(); //<==cos tu jebło chyba
-    });
-
-    return c_l + c_t;
-}*/
 
 void WordBase::BaseStrUpdate(WordSet &newS)
 {
@@ -83,18 +65,14 @@ void WordBase::BaseStrUpdate(WordSet &newS)
       baseString->append(QString::number(base->size())+"\n<br>\n");
       baseString->append(newS.getWordSetString());
       baseString->append("* <br>\n&");
-      //test->calcTerm();
-      //qDebug()<<*baseString;
 
 }
 void WordBase::loadBase()
 {
 
     base = new QMap <int, WordSet>;
-    //baseString = new QString;
-    //auto blue = new QMap<int, WordSet>;
+
     QFile file(baseFileName);
-    //QFile file(":/textf/baza.txt");
 
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -113,8 +91,8 @@ void WordBase::loadBase()
         temp = stream.readLine();
         if(temp=="* <br>")
         {
-            base->insert(n, std::move(tempSet)); ///przez referencje!
-            tempSet.clear(); ///ale dlaczego move nie usuwa???
+            base->insert(n, std::move(tempSet));
+            tempSet.clear();
             continue;
         }
         else if(temp=="&")
@@ -130,8 +108,27 @@ void WordBase::loadBase()
             if(temp.toInt()==0)
             {
                 QTextStream take(&temp);
-                take>>pln>>x>>eng;
+                while(true)
+                {
+                    x.clear();
+                    take>>x;
+                    if(x=="-") break;
+                    pln +=x;
+                    pln +=" ";
+                }
+                while(true)
+                {
+                    x.clear();
+                    take>>x;
+                    if(x=="<br>") break;
+                    eng +=x;
+                    eng +=" ";
+                }
+
+                //take>>eng;
                 tempSet.addWord(pln, eng);
+                pln.clear();
+                eng.clear();
             }
             else if(temp.toInt())
             {
@@ -152,7 +149,7 @@ void WordBase::saveBase()
         qDebug()<<"nie moge otworzyc pliku";
         return;
     }
-    //qDebug()<<"bip kurwa";
+
     QTextStream stream(&file);
 
     stream<<getBaseString();
@@ -172,14 +169,13 @@ void Test::calcTerm(int ID)
     using namespace std;
    QVector<int> rep_date;
    const int s_day = 86400; ///1 day in second
-   rep_date.push_back(getDate(0));
-   rep_date.push_back(getDate(s_day * 2));
-   rep_date.push_back(getDate(s_day * 7));
-   rep_date.push_back(getDate(s_day * 16));
-   rep_date.push_back(getDate(s_day * 31));
+   rep_date.push_back(getDate(s_day));
+   rep_date.push_back(getDate(s_day * 3));
+   rep_date.push_back(getDate(s_day * 8));
+   rep_date.push_back(getDate(s_day * 17));
+   rep_date.push_back(getDate(s_day * 32));
 
    for_each(rep_date.begin(), rep_date.end(), [&](auto rep){
-       //term->find(rep)) == term->end()
        if(term->find(rep) == term->end())
        {
            term->insert(rep, QVector<int>());
@@ -200,7 +196,7 @@ QVector<int> Test::lateSet() const
     QVector<int> temp;
     auto it = term->lowerBound(today);
     std::for_each(term->begin(), it, [&temp](auto t){
-        //temp.push_back(t);
+
         temp +=t;
     });
     return temp;
@@ -222,7 +218,6 @@ void Test::erSetfTer(int ID)
         auto new_end = std::remove(i.begin(), i.end(), ID);
         i.erase(new_end, i.end());
     });
-    //jeszcze usunac jesli pusty
 
     saveData();
 }
@@ -240,7 +235,6 @@ void Test::loadData()
     term = new QMap <int, QVector<int>>;
     termString = new QString;
 
-    //QFile file(baseFileName);
     QFile file("terminator.txt");
 
     if(!file.open(QFile::ReadOnly | QFile::Text))

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QWidget>
-//#include "info.h"
 #include "wordbase.h"
 #include "basewindow.h"
 #include "addword.h"
@@ -18,6 +17,7 @@ class QTextEdit;
 class QGridLayout;
 QT_END_NAMESPACE
 
+/* Main window of the program */
 
 class MainWindow : public QMainWindow
 {
@@ -25,27 +25,19 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow();
-    //~MainWindow();
-    void infoLaybelAct();
-    //void resizeEvent(QResizeEvent *event) override;
 public slots:
-    void changeWindow();
-    void backHome();
+    void changeWindow(); //load chosen window
+    void backHome(); //back to main window
 
 private:
-    //std::unique_ptr<WordBase> wordB; //WordBase base;
     std::shared_ptr<WordBase> wordB;
     QWidget *home;
-    //Info *infoWindow;
     BaseWindow *baseWindow;
     AddWord *addWordWindow;
     ReptWindow *reptWindow;
-    //QWidget *bla;
 
     QPushButton *addButton;
-    //QPushButton *kalendaryButton;
     QPushButton *baseButton;
-    //QPushButton *infoButton;
     QPushButton *exitButton;
     QPushButton *repeatButton;
 
@@ -55,15 +47,7 @@ private:
     QPushButton *backAdd;
     QPushButton *backRepeat;
 
-    //QTextEdit *mainInfo;
-
-    //QLabel *nRepWord;
-    //QLabel *nLearnWord;
-    //QLabel *name;
-
     QGridLayout *mainLayout;
-
-    //int repWordCount();
 
 };
 

@@ -20,6 +20,8 @@ class QTextEdit;
 class QStackedLayout;
 QT_END_NAMESPACE
 
+/*This class provide window interface dedicated to repeat words*/
+
 class ReptWindow : public QWidget
 {
     Q_OBJECT
@@ -30,20 +32,18 @@ public:
     QPair<int, int> getWH(){
         return QPair<int, int>(height(), height());
     } //return width and height
-signals:
 
 public slots:
-    void reptStartButt();
+    void reptStartButt(); //start repeating word(after chose words set to repeat)
     void mainUpdate(); ///update content of lateRep and todayRep
-    void backMainButt();
-    void checkButt();
+    void backMainButt(); //back to main menu
+    void checkButt(); // show if user answer is correct
 
 private:
     std::shared_ptr<WordBase> base_ptr;
 
     QStackedLayout *stackWidget;
-    ///main_window///
-    //QWidget *firstWindow;
+    ///Main Window dedicated to chose which set of words user want to repeat///
     QWidget *mainWindow;
     QGridLayout *mainLayout;
     QGroupBox *lateRep;
@@ -53,12 +53,9 @@ private:
     QPushButton *backB;
     QPushButton *reptStart;
     QLabel *info;
-    //QString *infoString;
-
-    //QVector<int> todayR;
     QList<QCheckBox*> late;
     QList<QCheckBox*> today;
-    ///child_window ///
+    ///Child Window dedicate to repeat words (sets chosen earier in main window)///
     QGroupBox *rightAnswerBox;
     QGroupBox *yourAnswerBox;
     QWidget *childWindow;
@@ -73,20 +70,19 @@ private:
     QLabel *downLabel_1;
     QLabel *downLabel_2;
     //reppeat staff
-    QQueue<int> *repList; ///list of IDsets to repeat
-    WordSet *currentSet;
+    QQueue<int> *repList; ///list of ID sets to repeat
+    WordSet *currentSet; //current repeating set
     int currentID;
     int current;
     int end;
     ///function_member///
-    bool getChecked(); //get chosen sets of QLate and QToday. return true if user chose nothing or is nothing to chose
-    void makeMainW();
-    void makeChild(); //second window after press Start! button
+    bool getChecked(); //add chosen word to Queue repList. Return true if user chose nothing or is nothing to chose
+    void makeMainW(); //create main window.
+    void makeChild(); //create child window (pop up after click Start! button)
     void setLoad(); //load set to currentSet
-    void workDone(); //show measega when you repeat ewrything
+    void workDone(); //show measega if you repeat all words
     void nothingToRept(); //show message when nothing left to reppeat or user chose nothing to repeat
-    //void warningWindow();
-    //void repeatMachine();
+
 };
 
 #endif // REPETWINDOW_H

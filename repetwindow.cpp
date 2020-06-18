@@ -12,8 +12,10 @@ ReptWindow::ReptWindow(QPushButton *back, std::shared_ptr<WordBase> base):
     childWindow = new QWidget;
     stackWidget = new QStackedLayout;
     mainLayout = new QGridLayout;
+    QFont font("cambria", 12);
     info = new QLabel(tr("Zaznacz zestawy które chcesz powtórzyć i naciśnij 'Start!'"));
     info ->setAlignment(Qt::AlignCenter);
+    info->setFont(font);
 
     backB=back;
     reptStart = new QPushButton(tr("Start!"));
@@ -39,19 +41,22 @@ ReptWindow::ReptWindow(QPushButton *back, std::shared_ptr<WordBase> base):
 }
 void ReptWindow::reptStartButt()
 {
-    // test czy wybrano jakikolwiek set
-    if(getChecked()) return;
+
+    if(getChecked()) return; //check if chose any set. If no, return
+
     setLoad();
-    stackWidget->setCurrentIndex(1);
+    stackWidget->setCurrentIndex(1); //open child window
+
 }
 void ReptWindow::backMainButt()
 {
+    //show message if user decide to leave repeatition before finish it.
     QMessageBox msgBox;
-    msgBox.setText("Pozostalo " + QString::number(end-current) + " słówek do powtórzenia. Wyjscie spowoduje zresetowanie czegos tam. Czy napewno wyjść? Później to lepiej napisze lol" );
+    msgBox.setText("Pozostalo " + QString::number(end-current) + " słówek do powtórzenia. Wyjscie spowoduje utratę postępów" );
     QPushButton *okButton = msgBox.addButton(tr("Ok"), QMessageBox::ActionRole);
     QPushButton *cancelButton = msgBox.addButton(tr("Cancel"), QMessageBox::ActionRole);
 
-    msgBox.exec(); // tworzy okno dialogowe i po jego zamknięciu zwraca id przycisku wciśniętego
+    msgBox.exec(); // create dialog windows.
 
     if (msgBox.clickedButton() == okButton) {
         getChecked();
@@ -66,9 +71,9 @@ void ReptWindow::checkButt()
     if(answer->toPlainText().isEmpty()) return;
 
     rightAnswer->setText(currentSet->getEngPln(current));
-    yourAnswer->setText(answer->toPlainText());
+    yourAnswer->setText(QString("Twoja odpowiedź: ")+answer->toPlainText());
     answer->clear();
-    engWord->setText(currentSet->getEng(current+1));
+    engWord->setText(currentSet->getPln(current+1));
     current++;
     downLabel_2->setText("Pozostało: " + QString::number(end-current) +" słówek");
     if(current == end)
@@ -96,11 +101,10 @@ void ReptWindow::mainUpdate()
     }
     delete lateRep;
     delete todayRep;
-    lateRep = new QGroupBox(tr("spozniony"));
-    todayRep = new QGroupBox(tr("dzisiaj"));
+    lateRep = new QGroupBox(tr("Powtórki spóźnione"));
+    todayRep = new QGroupBox(tr("Powtórki na dzisiaj"));
     auto lateLayout = new QVBoxLayout;
     auto todayLayout = new QVBoxLayout;
-    //QScrollArea *scrol = new QScrollArea;
 
     ///create QCheckBox
     if(todayR.empty() != true)
@@ -115,7 +119,6 @@ void ReptWindow::mainUpdate()
     {
         std::for_each(lateR.begin(), lateR.end(), [this, &lateLayout](int i){
             this->late.push_back(new QCheckBox(QString::number(i)));
-            //late.back()->setChecked(true);
             lateLayout ->addWidget(late.back());
         });
     }
@@ -177,40 +180,43 @@ void ReptWindow::makeChild()
 {
     childLayout = new QGridLayout;
 
+    QFont font("cambria", 12);
+
     rightAnswerBox = new QGroupBox("Prawidłowa odpowiedź");
     rightAnswer= new QLabel(tr("..............."));
+    rightAnswer->setFont(font);
     rightAnswer->setAlignment(Qt::AlignCenter);
-    //rightAnswerStr = new QString;
     yourAnswer = new QLabel(tr("..............."));
     yourAnswer->setAlignment(Qt::AlignCenter);
+    yourAnswer->setFont(font);
     engWord = new QLabel;
     engWord ->setAlignment(Qt::AlignCenter);
-    //engWordStr = new QString;
+    engWord->setFont(font);
+
     answer = new QTextEdit;
     answer -> setFixedSize(170, 25);
-    //setInfo = new QLabel(tr("Wcisnij enter by przejsc dalej"));
-    //setInfoStr = new QString;
     backMain = new QPushButton(tr("Powrót"));
     connect(backMain, &QPushButton::clicked, this, &ReptWindow::backMainButt);
     downLabel_1 = new QLabel("Zestaw 4");
-    downLabel_2 = new QLabel("Pozostalo 69 slowek");
+    downLabel_2 = new QLabel("Pozostalo ... slowek");
     downLabelStr = new QString;
     check = new QPushButton(tr("Sprawdz!"));
     connect(check, &QPushButton::clicked, this, &ReptWindow::checkButt);
+    QLabel *filer = new QLabel;
+    QLabel *filer2 = new QLabel;
 
-    childLayout -> addWidget(engWord, 0, 0);
-    childLayout -> addWidget(answer, 0, 1);
-    childLayout -> addWidget(check, 0, 2);
 
-    //childLayout -> addWidget(upLabel, 1, 0);
-    //childLayout -> addWidget(upLabel2, 1, 1);
-    childLayout -> addWidget(rightAnswer, 2, 0);
-    childLayout -> addWidget(yourAnswer, 2, 1);
+    childLayout ->addWidget(filer, 0, 0, 3, 1);
+    childLayout -> addWidget(engWord, 1, 0);
+    childLayout -> addWidget(answer, 1, 1);
+    childLayout -> addWidget(check, 1, 2);
 
-    //childLayout -> addWidget(setInfo, 3, 0);
-    childLayout -> addWidget(backMain, 3, 0);
-    childLayout -> addWidget(downLabel_1, 3, 1);
-    childLayout -> addWidget(downLabel_2, 3, 2);
+    childLayout -> addWidget(rightAnswer, 2, 0, 1, 3);
+    childLayout -> addWidget(yourAnswer, 3, 0, 1, 3);
+
+    childLayout -> addWidget(backMain, 4, 0);
+    childLayout -> addWidget(downLabel_1, 4, 1);
+    childLayout -> addWidget(downLabel_2, 4, 2);
 }
 
 void ReptWindow::setLoad()
@@ -225,7 +231,7 @@ void ReptWindow::setLoad()
     currentSet = base_ptr->getSet(currentID);
     current = 0;
     end = currentSet->getSize();
-    engWord->setText(currentSet->getEng(0)); //tu sie wypierdala
+    engWord->setText(currentSet->getPln(0));
     downLabel_1->setText("Zestaw nr " + QString::number(currentID));
     downLabel_2->setText("Pozostało: " + QString::number(end) + " słówek");
 
@@ -236,9 +242,8 @@ void ReptWindow::workDone()
     QMessageBox msgBox;
     msgBox.setText("Wszystko powtórzone, dobra robota!");
     QPushButton *okButton = msgBox.addButton(tr("Ok"), QMessageBox::ActionRole);
-    //QPushButton *cancelButton = msgBox.addButton(tr("Cancel"), QMessageBox::ActionRole);
 
-    msgBox.exec(); // tworzy okno dialogowe i po jego zamknięciu zwraca id przycisku wciśniętego
+    msgBox.exec();
 
     if (msgBox.clickedButton() == okButton) {
         stackWidget->setCurrentIndex(0);
@@ -249,10 +254,9 @@ void ReptWindow::workDone()
 void ReptWindow::nothingToRept()
 {
     QMessageBox msgBox;
-    msgBox.setText("Nie wybrano zestawów do powtórzenia lub żadne już nie zostały.");
-    //msgBox.setInformativeText("Uzupełnij pola by przejść dalej.");
+    msgBox.setText("Nie wybrano zestawów do powtórzenia/brak zestawów do powtórzenia.");
     msgBox.setStandardButtons(QMessageBox::Ok);
 
-    msgBox.exec(); // tworzy okno dialogowe i po jego zamknięciu zwraca id przycisku wciśniętego
+    msgBox.exec();
 
 }

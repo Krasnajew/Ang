@@ -6,13 +6,12 @@
 #include<QMap>
 #include<QDebug>
 
-//#include <QString>
 QT_BEGIN_NAMESPACE
 class QString;
 QT_END_NAMESPACE
 
 class WordBase;
-class Word
+class Word //this class use to contain polish-english pair of word
 {
 public:
     Word(){}
@@ -21,15 +20,15 @@ public:
         plnWord(pln),
         engWord(eng)
     {}
-    QString getEng() const {return engWord;} //zabezpieczyc przed epmpty?
-    QString getPln() const {return plnWord;} //zabezpieczyc przed epmpty?
+    QString getEng() const {return engWord;}
+    QString getPln() const {return plnWord;}
     QString getEngPln() const {return plnWord + " - " + engWord + " <br> ";}
 private:
     QString plnWord;
     QString engWord;
 };
 
-class WordSet
+class WordSet //this class contain set composed of many Word class object.
 {
 public:
     WordSet(QVector<Word>* s=nullptr):
@@ -37,12 +36,7 @@ public:
     {
 
         set = new QVector<Word>;
-        //size = 0;
-        //bla = new QVector<int>;
-
     }
-   // WordSet(const WordSet& a) = delete;
-   // WordSet& operator=(const WordSet& a) = delete;
     WordSet(const WordSet& a)
     {
         set = new QVector<Word>;
@@ -85,23 +79,21 @@ public:
     void addWord(QString pln, QString ang);
     void clear();
     void addID(int id){ID = id;}
-    QString getEng(int i) const { //zabezpieczyc przed epmpty?
+    QString getEng(int i) const {
         return set->value(i).getEng();
     }
-    QString getPln(int i) const { //zabezpieczyc przed epmpty?
+    QString getPln(int i) const {
         return set->value(i).getPln();
     }
     QString getEngPln(int i) const {return set->value(i).getEngPln();}
-    QString getWordSetString() const; /// przetestowac*/
-
+    QString getWordSetString() const;
 private:
     QVector<Word> *set;
-    //QVector<int> *bla;
     int ID;
-    //int size=0;
+
 };
 
-class Test
+class Test // this class is dedicated to every action connected with repeating words.
 {
 public:
     Test(const QString &name) : baseFileName(name)
@@ -110,18 +102,14 @@ public:
         }
         ~Test()
         {
-            //saveData(); //whyy?
         }
     void calcTerm(int ID); ///calculate date repetition -> 2, 5, 9, 15 day after learn word
-    void testYSelf();
     void testDay(const WordBase& wb); ///testujemy umiejetnosci
     void eraseTerm(int date) { term->erase(term->find(date));}
-    QVector<int> lateSet() const;
-    //QSet<int> lateSet() const; ///return IDs sets who user dont repeat in termin.
+    QVector<int> lateSet() const; //return IDs sets who user dont repeat in termin.
     QVector<int> todaySet() const; ///return IDs sets to repeat today.
     void erSetfTer(int ID); //erase chosen(ID) Set from term
 private:
-    //QStringList blab;
     QMap <int , QVector<int>> *term; // key store date of repetition, QVector store what set will be repetition
     QString *termString;
     QString baseFileName;
@@ -132,15 +120,11 @@ private:
 };
 
 
-class WordBase
+class WordBase // this class contain all of word sets.
 {
 
 public:
     WordBase(const QString &filename);
-    ~WordBase()
-    {
-       //saveBase();
-    }
     QString& getBaseFileName()
     {
         return baseFileName;
@@ -148,15 +132,8 @@ public:
     int addNewSet(WordSet &newS); ///return ID of newS set
     void addTerm(int ID){
         test->calcTerm(ID);
-        qDebug()<<"asd";
     }
 
-    /*const QString& getEng(int ID, int i) const { //zabezpieczyc przed epmpty?
-        return base->value(ID).getEng(i);
-    }
-    const QString& getPln(int ID, int i) const { //zabezpieczyc przed epmpty?
-        return base->value(ID).getEng(i);
-    }*/
     QString getEngPln(int ID, int i) const {
         return base->value(ID).getEngPln(i);
 
@@ -164,7 +141,7 @@ public:
     QString getWordSetString(int ID) const {
         return base->value(ID).getWordSetString();
     }
-    QString& getBaseString() ///przerobic
+    QString& getBaseString()
     {
         return *baseString;
     }

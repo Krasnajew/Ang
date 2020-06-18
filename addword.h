@@ -15,6 +15,8 @@ class QRadioButton;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
+/*This class provide window interface dedicated to adding a new sets of words*/
+
 class AddWord : public QWidget
 {
     Q_OBJECT
@@ -22,20 +24,17 @@ public:
     explicit AddWord(QPushButton *back, std::shared_ptr<WordBase> base);
     ~AddWord(){saveTemp();}
 public slots:
-    //void addButt;
-    void editButt();
-    void clearButt();
-    void saveButt();
-    void addButt();
-    void otherAddButt();
+    void clearButt(); //clear temporary word set
+    void saveButt(); //add temporary word set to Word Library and generate repetition
+    void addButt(); //pop up window dedicated to adding new words
+    void otherAddButt(); //add new word to temporary set
 
 private:
-    WordSet tempSet;
-    std::shared_ptr<WordBase> base_ptr; //pointer to main word library
+    WordSet tempSet; //temporary word set
+    std::shared_ptr<WordBase> base_ptr; //pointer to Word Library
     QGridLayout *layout;
 
     QPushButton *addButton;
-    QRadioButton *editButton;
     QPushButton *clearButton;
     QPushButton *saveButton;
 
@@ -51,10 +50,10 @@ private:
     QPushButton *add;
 
     /////
-    void makeAddWindow();
-    void saveTemp();
-    void loadTemp();
-    void setWords();
+    void makeAddWindow(); //create pop up window dedicated to add new polish-engilish word
+    void saveTemp(); //save temporary set to file
+    void loadTemp(); //load temporary set from file
+    void setWords(); //write temporary words( in QTextedit *write)
 };
 
 

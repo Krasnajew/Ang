@@ -1,7 +1,6 @@
 #include "addword.h"
 #include "wordbase.h"
 #include <QtWidgets>
-//#include <QTextStream>
 
 AddWord::AddWord(QPushButton *back, std::shared_ptr<WordBase> base):
     base_ptr(base)
@@ -12,21 +11,22 @@ AddWord::AddWord(QPushButton *back, std::shared_ptr<WordBase> base):
 
     layout = new QGridLayout;
 
+    //set buttons
     addButton = new QPushButton(tr("Dodaj slowo"));
     connect(addButton, &QPushButton::clicked, this, &AddWord::addButt);
-    //editButton = new QRadioButton("Edytuj");
-    //connect(editButton, &QRadioButton::clicked, this, &AddWord::editButt);
     clearButton = new QPushButton(tr("Wyczysc"));
     connect(clearButton, &QPushButton::clicked, this, &AddWord::clearButt);
     saveButton = new QPushButton(tr("Dodaj do powtorek"));
     connect(saveButton, &QPushButton::clicked, this, &AddWord::saveButt);
+
     words = new QTextEdit("Hiszpanska inkwizycja");
     words->setReadOnly(true);
     setWords();
 
+    //add Widget to layout
     layout ->addWidget(addButton,0,0);
     layout ->addWidget(clearButton, 1, 0);
-    //layout ->addWidget(editButton, 3, 0);
+
     layout ->addWidget(saveButton, 4, 1, 1, 2);
     layout ->addWidget(back, 4, 0);
     layout ->addWidget(words, 0, 1, 4, 2);
@@ -34,22 +34,6 @@ AddWord::AddWord(QPushButton *back, std::shared_ptr<WordBase> base):
     setLayout(layout);
 
 
-}
-
-void AddWord::editButt()
-{
-    static int blip = 0;
-
-    if(blip == 0)
-    {
-        blip = 1;
-        words->setReadOnly(false);
-    }
-    else if(blip == 1)
-    {
-        blip = 0;
-        words->setReadOnly(true);
-    }
 }
 
 void AddWord::clearButt()
@@ -63,11 +47,10 @@ void AddWord::saveButt()
     if(tempSet.getSize() == 0) return;
     else
     {
-        //qDebug()<<"basd";
-        int ID = base_ptr->addNewSet(tempSet);
-        base_ptr-> addTerm(ID);
-        base_ptr->BaseStrUpdate(tempSet);///baseString update
-        base_ptr->saveBase();
+        int ID = base_ptr->addNewSet(tempSet); //add temporary set to Word Library
+        base_ptr-> addTerm(ID); //generate term of repetition
+        base_ptr->BaseStrUpdate(tempSet); //update base Window
+        base_ptr->saveBase(); //save updated base file (Word Library source file)
         clearButt();
     }
 
@@ -82,24 +65,22 @@ void AddWord::addButt()
 
 void AddWord::otherAddButt()
 {
-   // qDebug()<<"as";
     if(wordPln->toPlainText().isEmpty() || wordEng->toPlainText().isEmpty())
     {
         QMessageBox msgBox;
         msgBox.setText("Jedno z pól jest puste. Uzupełnij pola by dodać słowo.");
-        //msgBox.setInformativeText("Uzupełnij pola by przejść dalej.");
         msgBox.setStandardButtons(QMessageBox::Ok);
 
-        msgBox.exec(); // tworzy okno dialogowe i po jego zamknięciu zwraca id przycisku wciśniętego
+        msgBox.exec();
 
     }
     else
     {
-        tempSet.addWord(wordPln->toPlainText(), wordEng->toPlainText());
+        tempSet.addWord(wordPln->toPlainText(), wordEng->toPlainText()); //add new word to temporary set
         wordPln->clear();
         wordEng->clear();
         setWords();
-        //saveTemp();
+
     }
 
 }
@@ -110,7 +91,7 @@ void AddWord::makeAddWindow()
     addWindow ->move(550, 500);
     addLayout = new  QGridLayout();
 
-    message = new QLabel("Wpisz slowo wedlug wzoru: polskie - angielskie i kliknij Dodaj słowo.");
+    message = new QLabel("Wpisz slowo wedlug wzoru: polskie - angielskie i kliknij 'Dodaj słowo'.");
 
     write = new QTextEdit();
     write->setReadOnly(false);
@@ -124,6 +105,8 @@ void AddWord::makeAddWindow()
     connect(close, &QPushButton::clicked, addWindow, &QWidget::close);
     add = new QPushButton(tr("Dodaj slowo"));
     connect(add, &QPushButton::clicked, this, &AddWord::otherAddButt);
+
+    //add Widget to layout
     addLayout->addWidget(message, 0, 0, 1, 2);
     addLayout ->addWidget(wordPln, 1, 0, 1, 1);
     addLayout ->addWidget(wordEng, 1, 1, 1, 1);
@@ -137,17 +120,15 @@ void AddWord::makeAddWindow()
 void AddWord::saveTemp()
 {
     QFile file("temp.txt");
-    //file.setPermissions(QFileDevice::WriteOther);
     if(!file.open(QFile::WriteOnly| QFile::Text))
     {
         qDebug()<<file.errorString();
         qDebug()<<"nie moge otworzyc pliku";
         return;
     }
-    //file.open(QFile::WriteOnly);
+
     QTextStream stream(&file);
-    //QString temp;
-    //temp=tempSet.getWordSetString();
+
     if(tempSet.getSize()==0) return;
     stream << tempSet.getWordSetString();
     stream.flush();
@@ -165,7 +146,7 @@ void AddWord::loadTemp()
         return;
     }
     QTextStream stream(&file);
-    //std::istream_iterator<QString> roman(stream);
+
     QString pln, eng, blip;
     while(!stream.atEnd())
     {
@@ -174,7 +155,7 @@ void AddWord::loadTemp()
         stream.skipWhiteSpace();
     }
     file.close();
-    //tempSet.addWord();
+
 }
 
 void AddWord::setWords()
